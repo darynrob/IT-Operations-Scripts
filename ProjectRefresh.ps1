@@ -1,3 +1,9 @@
+<#
+By: Daryn Roberts
+Date: 2/8/2023 
+Purpose: To identify Checkpoint FDE decrypted machines, remove the Endpoint Security client, and replace disk encryption method with AES-256 bit BitLocker Disk Encryption
+#>
+
 # Defining the list of computers using a text file
 $computerList = get-content -path "c:\WHEREEVERIDECIDE\computers.txt"
 
@@ -11,15 +17,15 @@ foreach ($computer in $computerList) {
   Write-Host "Checking for Check Point Endpoint Security on $computer"
   $checkPointInstalled = Get-WmiObject -Class Win32_Product | Where-Object { $_.Name -eq "Check Point Endpoint Security" }
 
-  if ($checkPointInstalled) {
+    if ($checkPointInstalled) {
     Write-Host "Uninstalling Check Point Endpoint Security from $computer"
     $checkPointInstalled.Uninstall()
   }
 
-  # Enable BitLocker on the current computer
+  # Enables BitLocker on the current computer
   Write-Host "Enabling BitLocker on $computer"
   Enable-BitLocker -MountPoint C: -EncryptionMethod Aes256 -UsedSpaceOnly -Skiphardwaretest -RecoveryPasswordProtector
 }
 
 # Output success message
-Write-Host "TPM initialization, Check Point Endpoint Security removal, and BitLocker enablement completed on all computers."
+Write-Host "BitLocker Successfully Enabled!"
