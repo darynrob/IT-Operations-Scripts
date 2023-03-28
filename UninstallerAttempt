@@ -1,0 +1,22 @@
+# Replace with the actual program name and password
+$programName = "ProgramName"
+$uninstallPassword = "Password123"
+
+# Retrieve the uninstall command
+$uninstallCommand = (Get-ItemProperty HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\* | Where-Object {$_.DisplayName -like "*$programName*"}).UninstallString
+
+# Build the command line arguments to uninstall the program silently and with the given password
+$uninstallArguments = "/qn REMOVE=ALL /PASSWORD=$uninstallPassword"
+
+# Start the uninstall process silently
+Start-Process -FilePath msiexec.exe -ArgumentList $uninstallCommand, $uninstallArguments -Wait -NoNewWindow
+
+# Check if the uninstall was successful
+$programInstalled = Get-ItemProperty HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\* | Where-Object {$_.DisplayName -like "*$programName*"}
+
+if (!$programInstalled) {
+    Write-Host "$programName has been successfully uninstalled."
+}
+else {
+    Write-Host "Failed to uninstall $programName."
+}
